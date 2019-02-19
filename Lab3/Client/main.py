@@ -10,7 +10,7 @@ import sys, urllib3
 #FILES - список файлов
 
 
-url = 'url'
+url = 'http://holanto.com/projects/KSIS/'
 
 http = urllib3.PoolManager()
 
@@ -56,14 +56,36 @@ if method in ['DELETE', 'COPY', 'MOVE']:
 
         exit(0)
 
-if method in ['PUT', 'POST']:
+if method == 'PUT':
+        url = url + destination + '/'
+        f = open(departure, "rb")
+        while True:
+                data = f.read(10485760)
+                if not data:
+                        break
+                r = http.request(method, url, body=data)
+                print(r.status)
+                method = 'POST'
 
+        f.close()
+        exit(0)
+
+if method == 'POST':
+        url = url + destination + '/'
+        f = open(departure, "rb")
+        while True:
+                data = f.read(10485760)
+                if not data:
+                        break
+                r = http.request(method, url, body=data)
+                print(r.status)
 
         exit(0)
-        
-f = open('test.txt', "rb")
-while True:
-        data = f.read(10485760)
-        if not data:
-                break
-        print(data)
+
+if method == 'GET':
+        url = url + departure + '/'
+        r = http.request(method, url)
+        f = open(destination, "wb")
+        f.write(r.data)
+        f.close()
+        exit(0)

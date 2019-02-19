@@ -55,10 +55,10 @@ if((($method == "COPY") or ($method == "MOVE")) and !(count($urls) == 2)){
  
     
 if (!file_exists($urls[0])){
-    
+     
     $paths = pathinfo($urls[0]);
     
-    if ((!is_dir($paths['dirname'])) and (($method == "PUT") or ($method == "POST"))){
+    if ((!is_dir($paths['dirname']) or ($paths['dirname'] == '.')) and (($method == "PUT") or ($method == "POST"))){
         mkdir($paths['dirname'], 0777, true);
     } else {
         header('HTTP/1.1 404 File Not Found');
