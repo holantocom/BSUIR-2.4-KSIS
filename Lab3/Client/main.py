@@ -9,6 +9,8 @@ import sys, urllib3
 #MOVE - перемещение файла; 2 параметра - откуда, куда
 #FILES - список файлов
 
+BUFFER_SIZE = 10485760
+
 
 url = 'http://holanto.com/projects/KSIS/'
 
@@ -22,8 +24,7 @@ destination = ''
 methods = ['GET', 'PUT', 'POST', 'DELETE', 'COPY', 'MOVE', 'FILES']
 
 if len(sys.argv) > 1:
-        method = sys.argv[1]
-        method = method.upper()
+        method = sys.argv[1].upper()
         if (method == 'DELETE') and (len(sys.argv) > 2):
                 departure = sys.argv[2].replace('/', ':')
         else:
@@ -32,6 +33,7 @@ if len(sys.argv) > 1:
                         destination = sys.argv[3].replace('../', '').replace('/', ':')
 else:
         exit(0)
+
 
 if method not in methods:
         print('Method not found')
@@ -60,7 +62,7 @@ if method == 'PUT':
         url = url + destination + '/'
         f = open(departure, "rb")
         while True:
-                data = f.read(10485760)
+                data = f.read(BUFFER_SIZE)
                 if not data:
                         break
                 r = http.request(method, url, body=data)
@@ -74,7 +76,7 @@ if method == 'POST':
         url = url + destination + '/'
         f = open(departure, "rb")
         while True:
-                data = f.read(10485760)
+                data = f.read(BUFFER_SIZE)
                 if not data:
                         break
                 r = http.request(method, url, body=data)
@@ -83,9 +85,22 @@ if method == 'POST':
         exit(0)
 
 if method == 'GET':
+
         url = url + departure + '/'
+
         r = http.request(method, url)
         f = open(destination, "wb")
         f.write(r.data)
+        f.close()
+
+        repeats = int(r.headers['Blocks'])
+        f = open(destination, "ab")
+
+        i = 1
+        while i < repeats:
+                i += 1
+                r = http.request(method, url, headers={'Current': i})
+                f.write(r.data)
+
         f.close()
         exit(0)

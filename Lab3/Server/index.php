@@ -9,6 +9,7 @@
     MOVE - перемещение файла /filename/filename1
     FILES - список файлов
 */
+define("BUFFER", 10485760);
 
 function glob_recursive($pattern, $flags = 0)
 {
@@ -72,7 +73,21 @@ switch ($method) {
         
         $myfile = fopen($urls[0], "r");
         header('HTTP/1.1 200 OK');
-        echo fread($myfile,filesize($urls[0]));
+        
+        if($_SERVER['HTTP_CURRENT'] > 0){
+            
+            fseek($myfile, BUFFER*(intval($_SERVER['HTTP_CURRENT']-1)));
+            echo fread($myfile, BUFFER);
+            fseek($myfile, 0);
+            
+        } else { 
+            
+            header('Blocks: '.ceil(filesize($urls[0])/BUFFER));
+            echo fread($myfile, BUFFER);
+            fseek($myfile, 0);
+            
+        }
+        
         fclose($myfile);
         
         break;
