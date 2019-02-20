@@ -60,6 +60,13 @@ if method not in methods:
         print('Method not found')
         exit(0)
 
+if method in ['PUT', 'POST']:
+        try:
+                fh = open(departure, 'r')
+        except FileNotFoundError:
+                print('Local file not found!')
+                exit(0)
+
 if method == 'FILES':
 
         r = http.request(method, url)
@@ -79,14 +86,18 @@ if method in ['DELETE', 'COPY', 'MOVE']:
         exit(0)
 
 if method == 'PUT':
+
         url = url + destination + '/'
         f = open(departure, "rb")
+
+        data = f.read(BUFFER_SIZE)
         while True:
-                data = f.read(BUFFER_SIZE)
                 if not data:
                         break
                 r = http.request(method, url, body=data)
-                method = 'POST'
+                if (r.status == 220) or (r.status == 221):
+                        data = f.read(BUFFER_SIZE)
+                        method = 'POST'
 
         print(HTTP_RESPONSES[r.status])
         f.close()
@@ -96,11 +107,14 @@ if method == 'PUT':
 if method == 'POST':
         url = url + destination + '/'
         f = open(departure, "rb")
+
+        data = f.read(BUFFER_SIZE)
         while True:
-                data = f.read(BUFFER_SIZE)
                 if not data:
                         break
                 r = http.request(method, url, body=data)
+                if r.status == 221:
+                        data = f.read(BUFFER_SIZE)
 
         print(HTTP_RESPONSES[r.status])
         f.close()

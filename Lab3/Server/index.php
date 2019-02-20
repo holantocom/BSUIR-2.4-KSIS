@@ -24,7 +24,7 @@ function glob_recursive($pattern, $flags = 0)
 
 
 $method = $_SERVER['REQUEST_METHOD'];
-chdir('users');
+chdir('users'); //
 
 if(isset($_GET['q'])){
     
@@ -116,7 +116,7 @@ switch ($method) {
     case 'PUT':
         
         $content = file_get_contents('php://input');
-        $result = file_put_contents($urls[0], $content);
+        $result = file_put_contents($urls[0], $content, LOCK_EX);
         if($result === FALSE)
             header('HTTP/1.1 520 Rewriting Error');
         else 
@@ -127,7 +127,7 @@ switch ($method) {
     case 'POST':
         
         $content = file_get_contents('php://input');
-        $result = file_put_contents($urls[0], $content, FILE_APPEND);
+        $result = file_put_contents($urls[0], $content, FILE_APPEND | LOCK_EX);
         if($result === FALSE)
             header('HTTP/1.1 521 Adding Error');
         else 
