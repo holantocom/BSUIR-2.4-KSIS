@@ -46,7 +46,7 @@ HTTP_RESPONSES = {
 
 if len(sys.argv) > 1:
         method = sys.argv[1].upper()
-        if len(sys.argv) == 2:
+        if len(sys.argv) == 3:
                 departure = sys.argv[2].replace('/', ':')
         else:
                 if len(sys.argv) > 3:
